@@ -52,9 +52,8 @@ Same can be done for `DCGAN`.
 
 # Results and Observations
 
-We want to emphasis on the evaluation metrics for generative models, and how generator loss per iteration, could lead to false interpretations of the quality of images.
-We observed our implementation against the state of the art DCGAN model for both **Inception Scores** and **Frechet Inception Distance**.
-Below are the plots for how fast our implementation converges for different batch sizes.
+We wish to focus on the evaluation metrics for generative models and how generator loss per iteration might lead to incorrect interpretations of image quality. For both **Inception Scores** and **Frechet Inception Distance**, we compared our implementation to the state-of-the-art DCGAN model. The charts below show how quickly our implementation converges for various batch sizes.
+
 | ![Alt text](plots/FID_score_comparision_64.png) | 
 |:--:| 
 | FID Score: CIFAR-10 for Batch Size - 64 |
