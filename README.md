@@ -14,6 +14,12 @@ GPUs used for single-node and distributed-training : **NVIDIA RTX 3070, NVIDIA T
 
 ![Alt text](plots/paperImage.PNG)
 
+
+Training Pipeline:
+
+
+![Alt text](plots/Diagram.gif)
+
 ## Generation Demo
 
 The demo on the **left is for DCGAN** image generation on the MNIST dataset, and **right one is our implementation**. As you can see, we generalize faster, and better.
