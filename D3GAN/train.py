@@ -194,6 +194,10 @@ def run(epochs, generator, discriminator1, discriminator2, loader, device, hpara
     avg_utilization = np.mean(device_utilization)
     avg_calc = calc_time / epochs
 
+    torch.save(generator.state_dict(), './saved/generator.pth')
+    torch.save(discriminator1.state_dict(), './saved/discriminator1.pth')
+    torch.save(discriminator2.state_dict(), './saved/discriminator1.pth')
+
     logs["g_loss"] = generator_loss
     logs["d1_loss"] = discriminator1_loss
     logs["d2_loss"] = discriminator2_loss

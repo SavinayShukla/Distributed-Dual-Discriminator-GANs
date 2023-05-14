@@ -184,6 +184,9 @@ def run(epochs, generator, discriminator, loader, device, hparams):
     avg_utilization = np.mean(device_utilization)
     avg_calc = calc_time / epochs
 
+    torch.save(generator.state_dict(), './saved/generator.pth')
+    torch.save(discriminator.state_dict(), './saved/discriminator.pth')
+
     logs["g_loss"] = generator_loss
     logs["d_loss"] = discriminator_loss
     logs["IS"] = IS_scores
@@ -196,6 +199,8 @@ def run(epochs, generator, discriminator, loader, device, hparams):
     logs["avg_calc"] = avg_calc
     logs["peak_mem_avg"] = peak_mem_avg
     logs["iterations"] = iterations
+
+
     return logs
 
 if __name__ == "__main__":

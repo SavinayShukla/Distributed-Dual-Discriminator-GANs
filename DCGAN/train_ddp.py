@@ -13,10 +13,12 @@ from torch.nn.parallel import DistributedDataParallel as DDP
 from torcheval.metrics import Throughput
 from torch.utils.data.distributed import DistributedSampler
 import json
+from torchmetrics.image.fid import FrechetInceptionDistance
+from torchmetrics.image.inception import InceptionScore
 
 def setup(rank, world_size):
     os.environ['MASTER_ADDR'] = 'localhost'
-    os.environ['MASTER_PORT'] = '12351'
+    os.environ['MASTER_PORT'] = '12353'
     dist.init_process_group("nccl", rank=rank, world_size=world_size)
 
 def cleanup():
@@ -102,6 +104,13 @@ def weights_init(m):
     elif classname.find('BatchNorm') != -1:
         m.weight.data.normal_(1.0, 0.02)
         m.bias.data.fill_(0)
+        
+def interpolate(batch):
+    arr = []
+    for img in batch:
+        pil_img = transforms.ToPILImage()(img)
+        arr.append(transforms.ToTensor()(pil_img))
+    return torch.stack(arr)
     
 def runner(rank, world_size, hprams):
     batch_size = hprams["batch_size"]
@@ -111,9 +120,9 @@ def runner(rank, world_size, hprams):
     epochs = hprams["epochs"]
     workers = hprams["workers"]
     setup(rank, world_size)
+    
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     print("Device and Rank: ", device, rank)
-    torch.cuda.set_device(rank)
     
     transform = transforms.Compose([
             transforms.Resize(32),
@@ -123,9 +132,8 @@ def runner(rank, world_size, hprams):
 
     dataset = datasets.CIFAR10(root='data/cifar10/', train=True, download=True, transform=transform)
     sampler = DistributedSampler(dataset, num_replicas=world_size, rank=rank, shuffle=False)
-    loader = torch.utils.data.DataLoader(
-        dataset, batch_size = batch_size, shuffle=False, sampler=sampler,
-        num_workers = workers)
+    loader = torch.utils.data.DataLoader(dataset, batch_size = batch_size, shuffle=False, sampler=sampler, num_workers = workers)
+    
     metric_loader = Throughput()
     metric = Throughput()
   
@@ -133,19 +141,16 @@ def runner(rank, world_size, hprams):
     discriminator_ = Discriminator(nz=hprams["nz"], ndf=hprams["ndf"], nc=hprams["nc"])
     
     generator_.apply(weights_init)
-    generator_.to(rank)
+    generator_.cuda(rank)
 
     discriminator_.apply(weights_init)
-    discriminator_.to(rank)
+    discriminator_.cuda(rank)
     
-    generator_ = torch.nn.SyncBatchNorm.convert_sync_batchnorm(generator_)
-    discriminator_ = torch.nn.SyncBatchNorm.convert_sync_batchnorm(discriminator_)
+    generator = DDP(generator_, device_ids=[rank],output_device=rank)
+    discriminator = DDP(discriminator_, device_ids=[rank], output_device=rank)
 
-    generator = DDP(generator_, device_ids=[rank])
-    discriminator = DDP(discriminator_, device_ids=[rank])
-
-    criterion = nn.BCELoss().cuda()
-    fixed_noise = torch.randn(batch_size, nz, 1, 1).cuda()
+    criterion = nn.BCELoss().cuda(rank)
+    fixed_noise = torch.randn(batch_size, nz, 1, 1).cuda(rank)
 
     real_label = 1.
     fake_label = 0.
@@ -153,11 +158,15 @@ def runner(rank, world_size, hprams):
     optimizerD = optim.Adam(discriminator.parameters(), lr=lr, betas=(0.5, 0.99))
     optimizerG = optim.Adam(generator.parameters(), lr=lr,betas=(0.5, 0.99))
     
+    
     schedularG = torch.optim.lr_scheduler.LambdaLR(optimizerG, lambda step: 1 - step / (epochs*len(loader)))
     schedularD = torch.optim.lr_scheduler.LambdaLR(optimizerD, lambda step: 1 - step / (epochs*len(loader)))
 
     generator_loss, discriminator_loss = [], []
     peak_memory = []
+    avg_d_x = []
+    avg_d_g1 = []
+    avg_d_g2 = []
     avg_dataloading_time = 0.0
     calc_time = 0.00
     thput_sum = 0.00
@@ -183,25 +192,28 @@ def runner(rank, world_size, hprams):
         total = 0
         for i, data in enumerate(loader, 0):
             calc_start = time.monotonic()
+            
             discriminator.zero_grad()
-            real_cpu = data[0].cuda()
-            data_length = len(real_cpu)
+            real_cpu = data[0].cuda(rank)
             b_size = real_cpu.size(0)
-            label = torch.full((b_size,), real_label, dtype=torch.float).cuda()
+            label = torch.full((b_size,), real_label, dtype=torch.float).cuda(rank)
+            
             # Discriminator start
             output = discriminator(real_cpu).view(-1)
             errD_real = criterion(output, label)
             errD_real.backward()
             D_x += output.mean().item()
 
-            noise = torch.randn(b_size, 100, 1, 1).cuda()
+            noise = torch.randn(b_size, 100, 1, 1).cuda(rank)
             fake = generator(noise)
             label.fill_(fake_label)
             output = discriminator(fake.detach()).view(-1)
+            
             errD_fake = criterion(output, label)
             errD_fake.backward()
             D_G_z1 += output.mean().item()
             errD = errD_real + errD_fake
+            # errD.backward()
             optimizerD.step()
             #Discriminator end
 
@@ -213,9 +225,8 @@ def runner(rank, world_size, hprams):
             errG.backward()
             D_G_z2 += output.mean().item()
             optimizerG.step()
-            schedularG.step()
-            schedularD.step()
-            
+            # schedularG.step()
+            # schedularD.step()
             calc_end = time.monotonic()
             calculation_time += calc_end - calc_start
             total += b_size
@@ -227,7 +238,7 @@ def runner(rank, world_size, hprams):
             max_mem_allocated = torch.cuda.max_memory_allocated()
             cumulative_memory_usage += (max_mem_allocated/1024**2) / world_size
         
-        peak_memory.append(cumulative_memory_usage)
+        # peak_memory.append(cumulative_memory_usage)
         dataloadingtime_end = time.monotonic()
         training_time = (dataloadingtime_end - dataloadingtime_start)
         total_training_time += training_time
@@ -239,15 +250,24 @@ def runner(rank, world_size, hprams):
         metric.update(total, calculation_time)
         thput_loader = metric_loader.compute() * world_size
         thput = metric.compute() * world_size
-        thput_sum += thput
+        thput_sum += thput.item()
+        
+        avg_D_x = D_x / len(loader)
+        avg_D_G_z1 = D_G_z1 / len(loader)
+        avg_D_G_z2 = D_G_z2 / len(loader)
+        
         avg_g_loss = g_loss / total
         avg_d_loss = d_loss / total
-        
         avg_utilization = utilization / len(loader)
         generator_loss.append(avg_g_loss)
         discriminator_loss.append(avg_d_loss)
+        avg_d_x.append(avg_D_x)
+        avg_d_g1.append(avg_D_G_z1)
+        avg_d_g2.append(avg_D_G_z2)
+        
         if(rank==0):
-            print(f"Epoch: {epoch}, G_Loss: {avg_g_loss}, D_Loss: {avg_d_loss}\nUtilization: {avg_utilization}, Throughput(with Loaders): {thput_loader}, Throughput: {thput}, Epoch Time: {training_time}, Peak Memory: {cumulative_memory_usage:.2f} MB")
+            print(f"Epoch: {epoch}, G_Loss: {avg_g_loss}, D_Loss: {avg_d_loss}, D(x): {avg_D_x}, D(G(x):{avg_D_G_z1} / {avg_D_G_z2}\nUtilization: {avg_utilization}, Throughput(with Loaders): {thput_loader}, Throughput: {thput}, Epoch Time: {training_time} sec")
+            #  print(f"Epoch: {epoch}, G_Loss: {avg_g_loss}, D_Loss: {avg_d_loss}\nUtilization: {avg_utilization}, Throughput(with Loaders): {thput_loader}, Throughput: {thput}, Epoch Time: {training_time}, Peak Memory: {cumulative_memory_usage:.2f} MB")
             print("**********************************************************")
 
     if(rank==0):     
@@ -255,7 +275,6 @@ def runner(rank, world_size, hprams):
     dist_training_end = time.monotonic()
 
     if(rank==0):
-        peak_mem_avg = np.mean(peak_memory)
         avg_training_time = total_training_time /epochs
         avg_thrpt = thput_sum/epochs
         avg_dataloading_time = avg_dataloading_time/epochs
@@ -265,7 +284,9 @@ def runner(rank, world_size, hprams):
         print(f"Average Throughput per device: {avg_thrpt}")
         print(f"Average Data Loading Time per device: {avg_dataloading_time} sec")
         print(f"Average Calculation Time: {avg_calc} sec")
-        print(f"Peak Memory Usage: {peak_mem_avg / world_size}")
+
+        torch.save(generator.state_dict(), './saved/generator.pth')
+        torch.save(discriminator.state_dict(), './saved/discriminator.pth')
 
         logs["g_loss"] = generator_loss
         logs["d_loss"] = discriminator_loss
@@ -274,9 +295,11 @@ def runner(rank, world_size, hprams):
         logs["avg_thrpt"] = avg_thrpt
         logs["avg_training_time"] = avg_training_time
         logs["avg_calc"] = avg_calc
-        logs["peak_mem_avg"] = peak_mem_avg / world_size
+        logs["avg_D_x"] = avg_d_x
+        logs["avg_D_G_z1"] = avg_d_g1
+        logs["avg_D_G_z2"] = avg_d_g2
 
-        is_file = 'logs/log_'+str(time.time())+'.json'
+        is_file = 'logs/log_dcgan_'+str(world_size)+'_'+str(time.time())+'.json'
         with open(is_file, 'w') as file_object:  
             json.dump(logs, file_object)
 
@@ -286,8 +309,7 @@ if __name__ == "__main__":
     
     n_gpus = torch.cuda.device_count()
     # assert n_gpus >= 2, f"Requires at least 2 GPUs to run, but got {n_gpus}"
-    world_size = n_gpus
-    print("Changes observed!")
+    world_size = 4
     hparams = dict()
     hparams["type"] = "cifar10"
     hparams["batch_size"] = 128
@@ -298,7 +320,7 @@ if __name__ == "__main__":
     hparams["lr"] = 0.0002
     hparams["betas"] = [0.5, 0.999]
     hparams["checkpoint"] = 200
-    hparams["workers"] = 1
+    hparams["workers"] = 0
     hparams["epochs"] = 30
 
     print(f"Dataset : {hparams['type']}")
@@ -308,7 +330,6 @@ if __name__ == "__main__":
     print(f"Discriminator Filters : {hparams['ndf']}")
     print(f"Channels : {hparams['nc']}")
     print(f"Learning Rate : {hparams['lr']}")
-    print(f"Workers : {hparams['workers']}")
     print(f"Epochs : {hparams['epochs']}")
 
     if not os.path.exists("results"):
@@ -322,6 +343,9 @@ if __name__ == "__main__":
     if not os.path.exists("results/"+hparams["type"]):
         print("Result sub directory...")
         os.mkdir("results/"+hparams["type"])
+    
+    print("############################################################################")
+    print(f"Initiating Distributed Training Schedule with {world_size} CUDA Devices\n")
 
     mp.spawn(runner,
              args=(world_size,hparams),
