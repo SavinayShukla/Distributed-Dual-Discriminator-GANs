@@ -88,6 +88,21 @@ Below are some benchmarks on the scalibility of our implementation across multip
 | GPU Utilization |
 
 
+# Observations & Conclusions
+
+Our experimental results show that the addition of another discriminator improves the quality of generated images **and its convergence is must faster**.
+
+Our pipeline holds true across the majority of datasets that are widely used for generative modeling.
+
+Even though training time increases because of an additional discriminator, the overall time to converge is much lesser than DCGAN.
+
+We strongly believe that this pipeline could be generalized for multiple discriminators in the network. 
+
+Stronger and faster convergence could be achieved with more sophisticated and deeper networks. 
+
+
+
+
 
 
 

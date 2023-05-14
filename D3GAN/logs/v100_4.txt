@@ -1,0 +1,120 @@
+Dataset : cifar10
+Batch Size : 128
+Latent Noise Dimenstion : 100
+Generator Filters : 64
+Discriminator Filters : 64
+Channels : 3
+Learning Rate : 0.0002
+Epochs : 30
+############################################################################
+Initiating Distributed Training Schedule with 4 CUDA Devices
+
+Device and Rank:  cuda 0
+Device and Rank:  cuda 3
+Device and Rank:  cuda 1
+Device and Rank:  cuda 2
+Files already downloaded and verified
+Files already downloaded and verified
+Files already downloaded and verified
+Files already downloaded and verified
+Starting Distrubuted Training
+Starting Distrubuted Training
+Starting Distrubuted Training
+Starting Distrubuted Training
+Epoch: 0, G_Loss: 0.0549287056350708, D1_Loss: 0.0033799251639842986, D2_Loss: 0.0033799251639842986
+Utilization: 43.357142857142854, Throughput(with Loaders): 6258.338887665488, Throughput: 11922.100365774386, Epoch Time: 7.989340445999915 sec
+**********************************************************
+Epoch: 1, G_Loss: 0.03753966323852539, D1_Loss: 0.003987327187657356, D2_Loss: 0.003987327187657356
+Utilization: 42.13265306122449, Throughput(with Loaders): 6931.13944360851, Throughput: 14732.932784512148, Epoch Time: 6.438301763999789 sec
+**********************************************************
+Epoch: 2, G_Loss: 0.03733562545776367, D1_Loss: 0.003327284155488014, D2_Loss: 0.003327284155488014
+Utilization: 44.357142857142854, Throughput(with Loaders): 7207.377136122571, Throughput: 15886.686642577144, Epoch Time: 6.384367091999593 sec
+**********************************************************
+Epoch: 3, G_Loss: 0.03745311981201172, D1_Loss: 0.003953423038721085, D2_Loss: 0.003953423038721085
+Utilization: 44.275510204081634, Throughput(with Loaders): 7353.48574994233, Throughput: 16513.353268404775, Epoch Time: 6.385976360999848 sec
+**********************************************************
+Epoch: 4, G_Loss: 0.043356494026184085, D1_Loss: 0.003315424667596817, D2_Loss: 0.003315424667596817
+Utilization: 42.642857142857146, Throughput(with Loaders): 7449.406008737988, Throughput: 17039.730010207288, Epoch Time: 6.361737046000144 sec
+**********************************************************
+Epoch: 5, G_Loss: 0.04284574966430664, D1_Loss: 0.003560120218992233, D2_Loss: 0.003560120218992233
+Utilization: 42.816326530612244, Throughput(with Loaders): 7531.114027548544, Throughput: 17327.94285837306, Epoch Time: 6.275021380999988 sec
+**********************************************************
+Epoch: 6, G_Loss: 0.041394103946685794, D1_Loss: 0.003197839803993702, D2_Loss: 0.003197839803993702
+Utilization: 44.6530612244898, Throughput(with Loaders): 7572.54735116809, Throughput: 17512.223723921892, Epoch Time: 6.384841442999914 sec
+**********************************************************
+Epoch: 7, G_Loss: 0.04449784275054932, D1_Loss: 0.0025791584303975104, D2_Loss: 0.0025791584303975104
+Utilization: 44.52040816326531, Throughput(with Loaders): 7600.575343602082, Throughput: 17642.4962666995, Epoch Time: 6.408009342000241 sec
+**********************************************************
+Epoch: 8, G_Loss: 0.04957608434677124, D1_Loss: 0.002598533398509026, D2_Loss: 0.002598533398509026
+Utilization: 44.06122448979592, Throughput(with Loaders): 7625.747834208659, Throughput: 17770.936724317417, Epoch Time: 6.3830110070002775 sec
+**********************************************************
+Epoch: 9, G_Loss: 0.04528762870788574, D1_Loss: 0.002338651824593544, D2_Loss: 0.002338651824593544
+Utilization: 43.92857142857143, Throughput(with Loaders): 7648.046976032448, Throughput: 17858.412323024582, Epoch Time: 6.365561597999658 sec
+**********************************************************
+Epoch: 10, G_Loss: 0.04738089588165283, D1_Loss: 0.0027256538879871367, D2_Loss: 0.0027256538879871367
+Utilization: 44.255102040816325, Throughput(with Loaders): 7658.804138987462, Throughput: 17915.23393500634, Epoch Time: 6.436610340000243 sec
+**********************************************************
+Epoch: 11, G_Loss: 0.04666306732177734, D1_Loss: 0.0024702037823200224, D2_Loss: 0.0024702037823200224
+Utilization: 43.94897959183673, Throughput(with Loaders): 7683.163842982734, Throughput: 18003.825069634764, Epoch Time: 6.280051157999878 sec
+**********************************************************
+Epoch: 12, G_Loss: 0.04661411796569824, D1_Loss: 0.0024136161682009696, D2_Loss: 0.0024136161682009696
+Utilization: 44.90816326530612, Throughput(with Loaders): 7695.098431856604, Throughput: 18009.50142090179, Epoch Time: 6.376525866000065 sec
+**********************************************************
+Epoch: 13, G_Loss: 0.045489203338623045, D1_Loss: 0.0023158245104551315, D2_Loss: 0.0023158245104551315
+Utilization: 45.265306122448976, Throughput(with Loaders): 7707.8946343603575, Throughput: 18030.091080714323, Epoch Time: 6.346624513000279 sec
+**********************************************************
+Epoch: 14, G_Loss: 0.04361470748901367, D1_Loss: 0.0027172461554408073, D2_Loss: 0.0027172461554408073
+Utilization: 44.285714285714285, Throughput(with Loaders): 7724.685926888481, Throughput: 18095.280955208236, Epoch Time: 6.275346698000249 sec
+**********************************************************
+Epoch: 15, G_Loss: 0.04539254278182983, D1_Loss: 0.0030221638941764833, D2_Loss: 0.0030221638941764833
+Utilization: 44.0, Throughput(with Loaders): 7740.335898413794, Throughput: 18159.807782843094, Epoch Time: 6.263361712999995 sec
+**********************************************************
+Epoch: 16, G_Loss: 0.04180695398330689, D1_Loss: 0.002594035611152649, D2_Loss: 0.002594035611152649
+Utilization: 44.204081632653065, Throughput(with Loaders): 7751.247619997972, Throughput: 18211.940272520173, Epoch Time: 6.305078203999983 sec
+**********************************************************
+Epoch: 17, G_Loss: 0.0394458186340332, D1_Loss: 0.003223146585598588, D2_Loss: 0.003223146585598588
+Utilization: 44.316326530612244, Throughput(with Loaders): 7763.48484346002, Throughput: 18255.369721039864, Epoch Time: 6.267555089000325 sec
+**********************************************************
+Epoch: 18, G_Loss: 0.037579750080108644, D1_Loss: 0.003242698440551758, D2_Loss: 0.003242698440551758
+Utilization: 43.0, Throughput(with Loaders): 7771.349643703735, Throughput: 18332.379783060514, Epoch Time: 6.316567523999765 sec
+**********************************************************
+Epoch: 19, G_Loss: 0.036971131916046146, D1_Loss: 0.0032117052698135374, D2_Loss: 0.0032117052698135374
+Utilization: 43.59183673469388, Throughput(with Loaders): 7777.7213890125095, Throughput: 18378.107713836394, Epoch Time: 6.328472134000094 sec
+**********************************************************
+Epoch: 20, G_Loss: 0.03732834487915039, D1_Loss: 0.003168290546387434, D2_Loss: 0.003168290546387434
+Utilization: 44.265306122448976, Throughput(with Loaders): 7783.226573248719, Throughput: 18399.68554546609, Epoch Time: 6.333129968999856 sec
+**********************************************************
+Epoch: 21, G_Loss: 0.03731392902374268, D1_Loss: 0.003491281003057957, D2_Loss: 0.003491281003057957
+Utilization: 44.62244897959184, Throughput(with Loaders): 7788.203957874047, Throughput: 18409.75892845887, Epoch Time: 6.333748287999697 sec
+**********************************************************
+Epoch: 22, G_Loss: 0.03658622165679932, D1_Loss: 0.0031077395908534525, D2_Loss: 0.0031077395908534525
+Utilization: 44.224489795918366, Throughput(with Loaders): 7792.235128530228, Throughput: 18427.300972474928, Epoch Time: 6.343576612999641 sec
+**********************************************************
+Epoch: 23, G_Loss: 0.0394904391258955, D1_Loss: 0.003074222441315651, D2_Loss: 0.003074222441315651
+Utilization: 44.97959183673469, Throughput(with Loaders): 7794.616055403091, Throughput: 18430.54179233286, Epoch Time: 6.369603807999738 sec
+**********************************************************
+Epoch: 24, G_Loss: 0.03682339848279953, D1_Loss: 0.003560960136651993, D2_Loss: 0.003560960136651993
+Utilization: 44.47959183673469, Throughput(with Loaders): 7796.200828251398, Throughput: 18422.007424524298, Epoch Time: 6.382085515999734 sec
+**********************************************************
+Epoch: 25, G_Loss: 0.03520537532806396, D1_Loss: 0.002835132792443037, D2_Loss: 0.002835132792443037
+Utilization: 44.214285714285715, Throughput(with Loaders): 7801.52553476869, Throughput: 18446.661790807513, Epoch Time: 6.2995712310003 sec
+**********************************************************
+Epoch: 26, G_Loss: 0.036131213960647585, D1_Loss: 0.0036529743079841137, D2_Loss: 0.0036529743079841137
+Utilization: 42.724489795918366, Throughput(with Loaders): 7806.698255533107, Throughput: 18496.37744056141, Epoch Time: 6.294344529000227 sec
+**********************************************************
+Epoch: 27, G_Loss: 0.035766815071105955, D1_Loss: 0.0030132402351498604, D2_Loss: 0.0030132402351498604
+Utilization: 43.16326530612245, Throughput(with Loaders): 7813.031105700456, Throughput: 18542.26898195496, Epoch Time: 6.25939786500021 sec
+**********************************************************
+Epoch: 28, G_Loss: 0.03533524507522583, D1_Loss: 0.003390082677155733, D2_Loss: 0.003390082677155733
+Utilization: 44.83673469387755, Throughput(with Loaders): 7819.552374194861, Throughput: 18559.43007429104, Epoch Time: 6.244790723000278 sec
+**********************************************************
+Epoch: 29, G_Loss: 0.03470954875946045, D1_Loss: 0.003198787005841732, D2_Loss: 0.003198787005841732
+Utilization: 45.03061224489796, Throughput(with Loaders): 7824.37816954953, Throughput: 18567.291949551018, Epoch Time: 6.27591600400001 sec
+**********************************************************
+
+Distributed Training Completed...
+Average Training Time per device: 6.390284175499998 sec
+Total Distributed Training Time: 191.7153110459999 sec
+Average Throughput: 17676.655920100016
+Average Data Loading Time per device: 3.697376661800399 sec
+Average Calculation Time: 2.692907513699599 sec
