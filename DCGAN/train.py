@@ -142,14 +142,12 @@ def run(epochs, generator, discriminator, loader, device, hparams):
         avg_dataloading_time += dataloadingtime
         calc_time += calculation_time
 
-        
         metric_with_loader.update(total, training_time)
         metric_without_loader.update(total, calculation_time)
         thput_with_loader = metric_with_loader.compute()
         thput_without_loader = metric_without_loader.compute()
         thput_with_loader_sum += thput_with_loader.item()
         thput_without_loader_sum += thput_without_loader.item()
-
 
         avg_g_loss = g_loss / total
         avg_d_loss = d_loss / total

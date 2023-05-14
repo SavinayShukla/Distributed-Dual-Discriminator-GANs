@@ -107,18 +107,25 @@ def run(epochs, generator, discriminator1, discriminator2, loader, device, hpara
             output = discriminator2(fake.detach()).view(-1)
             errD2_fake = criterion(output, fake_label)
 
+            # Swapping errors.
             errD1 = (errD1_real  + errD2_fake)
             errD2 = (errD2_real  + errD1_fake)
 
+            # Savinge errors for referencing by the generator later.
             disc_dict[discriminator1] = errD1
             disc_dict[discriminator2] = errD2
             errD = errD1 + errD2
 
+            # Total Backward Pass.
             errD.backward()
             optimizerD1.step()
             optimizerD2.step()
+
             ############################
-            # (2) Update G network: maximize log(D(G(z)))
+            # (2) Update G network: Pick the max error and reduce.
+            # One could also use a min/random architecture. Future Work
+            # We could also divide / pick the discriminator based on gradient updates and norms -> WGAN with multiple Discriminators.
+            # Multiple Discriminators could also be counter-productive.
             ###########################
             discriminator = max(disc_dict, key=disc_dict.get)
             generator.zero_grad()
@@ -196,7 +203,7 @@ def run(epochs, generator, discriminator1, discriminator2, loader, device, hpara
 
     torch.save(generator.state_dict(), './saved/generator.pth')
     torch.save(discriminator1.state_dict(), './saved/discriminator1.pth')
-    torch.save(discriminator2.state_dict(), './saved/discriminator1.pth')
+    torch.save(discriminator2.state_dict(), './saved/discriminator2.pth')
 
     logs["g_loss"] = generator_loss
     logs["d1_loss"] = discriminator1_loss
