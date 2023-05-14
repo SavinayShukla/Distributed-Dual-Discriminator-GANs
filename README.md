@@ -1,10 +1,16 @@
 # Distributed Training of Dual Discriminator GANs.
-### Authors : Savinay Shukla, Ishaan Pitty 
+### Authors : Savinay Shukla(ss16924), Ishaan Pitty (ip2244) 
 
 
 <br>
 
-In this project, we propose add another discriminator in a typical DCGAN training pipeline for the Generator to acheive better and faster convergence. Adding another discriminator will force the Generator to fool two discriminators at once, and disallow any the dominance of Discriminator training.
+In this project, we propose add another discriminator in a typical DCGAN training pipeline for the Generator to acheive better and faster convergence. Adding another discriminator will force the Generator to fool two discriminators at once, and disallow the dominance of Discriminator training. 
+
+Our results are based on implementing our improvised training pipeline across various datasets which include **CIFAR-10, CIFAR-100, MNIST and SVHN**. We benchmarked our performance on various datasets to know possible limitations and improvements across a diverse set of images.
+
+GPUs used for single-node and distributed-training : **NVIDIA RTX 3070, NVIDIA Tesla V100**.
+
+**Copy of presentation**: https://tome.app/n-011/double-the-discrimination-clhmm4xfw1vyncd40wpg6enqe
 
 ![Alt text](plots/paperImage.PNG)
 
@@ -35,7 +41,8 @@ python3 train_ddp.py
 Configurations can be set in the `config.ini` file, for different hyper-parameters. We have selected some parameters for you, which according to us produces the most consistent comparision.
 
 Same can be done for `DCGAN`.
-Please note: DCGAN implementation is for benchmarking only.
+
+**Please note**: DCGAN implementation is for benchmarking only.
 
 # Results and Observations
 
